@@ -15,6 +15,21 @@
                 <a class="nav-link" href="/">Beranda</a>
                 <a class="nav-link" href="/halo">Halo</a>
                 <a class="nav-link" href="/about">Tentang</a>
+                @auth
+                    <a class="nav-link" href="{{ route('catatan.index') }}">Catatan</a>
+                @endauth
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                @auth
+                    <span class="text-light">{{ auth()->user()->name }}</span>
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit" class="btn btn-outline-light btn-sm">Keluar</button>
+                    </form>
+                @else
+                    <a href="{{ route('login') }}" class="btn btn-outline-light btn-sm">Masuk</a>
+                    <a href="{{ route('register') }}" class="btn btn-success btn-sm">Daftar</a>
+                @endauth
             </div>
         </div>
     </nav>

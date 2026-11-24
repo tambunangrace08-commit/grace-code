@@ -8,7 +8,7 @@
         <h2>Daftar Catatan</h2>
     </div>
     <div class="col-auto">
-        <a href="/catatan/tambah" class="btn btn-success">+ Tambah Baru</a>
+        <a href="{{ route('catatan.create') }}" class="btn btn-success">+ Tambah Baru</a>
     </div>
 </div>
 
@@ -27,9 +27,9 @@
                     </div>
                     <div class="card-body">
                         <p class="card-text">{{ Str::limit($item->isi, 100) }}</p>
-                        <a href="#" class="btn btn-sm btn-outline-primary">Lihat</a>
-                        <a href="#" class="btn btn-sm btn-outline-warning">Edit</a>
-                        <form action="#" method="POST" class="d-inline">
+                        <a href="{{ route('catatan.show', $item) }}" class="btn btn-sm btn-outline-primary">Lihat</a>
+                        <a href="{{ route('catatan.edit', $item) }}" class="btn btn-sm btn-outline-warning">Edit</a>
+                        <form action="{{ route('catatan.destroy', $item) }}" method="POST" class="d-inline">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Yakin?')">Hapus</button>
@@ -41,7 +41,7 @@
     </div>
 @else
     <div class="alert alert-info">
-        Belum ada catatan. <a href="/catatan/tambah">Buat catatan pertama!</a>
+        Belum ada catatan. <a href="{{ route('catatan.create') }}">Buat catatan pertama!</a>
     </div>
 @endif
 @endsection
