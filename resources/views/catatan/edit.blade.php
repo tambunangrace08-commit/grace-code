@@ -8,6 +8,17 @@
         <div class="card">
             <div class="card-header">Edit Catatan</div>
             <div class="card-body">
+
+                @if($errors->any())
+                    <div class="alert alert-danger">
+                        <ul class="mb-0">
+                            @foreach($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
                 <form method="POST" action="{{ route('catatan.update', $catatan) }}">
                     @csrf
                     @method('PUT')
@@ -26,6 +37,7 @@
                     </div>
                     <a href="{{ route('catatan.index') }}" class="mt-2 d-block text-center">&larr; Kembali ke Daftar</a>
                 </form>
+
             </div>
         </div>
     </div>

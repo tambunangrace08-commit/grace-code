@@ -8,6 +8,17 @@
         <div class="card">
             <div class="card-header">Tambah Catatan Baru</div>
             <div class="card-body">
+
+                @if($errors->any())
+                    <div class="alert alert-danger">
+                        <ul class="mb-0">
+                            @foreach($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
                 <form method="POST" action="{{ route('catatan.store') }}">
                     @csrf
                     <div class="mb-3">
@@ -25,8 +36,9 @@
                     </div>
                     <a href="{{ route('catatan.index') }}" class="mt-2 d-block text-center">&larr; Kembali ke Daftar</a>
                 </form>
+
             </div>
         </div>
     </div>
 </div>
-@endsection
+@endsections
