@@ -26,6 +26,9 @@ Route::middleware('auth')->prefix('catatan')->name('catatan.')->group(function (
     Route::get('/', [CatatanController::class, 'index'])->name('index');
     Route::get('/tambah', [CatatanController::class, 'create'])->name('create');
     Route::get('/arsip', [CatatanController::class, 'arsip'])->name('arsip');
+    Route::get('/export', [CatatanController::class, 'export'])->name('export');
+    Route::get('/import', [CatatanController::class, 'importForm'])->name('import.form');
+    Route::post('/import', [CatatanController::class, 'import'])->name('import');
     Route::post('/', [CatatanController::class, 'store'])->name('store');
     Route::get('/{catatan}', [CatatanController::class, 'show'])->name('show');
     Route::get('/{catatan}/edit', [CatatanController::class, 'edit'])->name('edit');

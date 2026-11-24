@@ -8,13 +8,28 @@ use App\Models\Catatan;
 
 class CatatanController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $catatan = Catatan::where('user_id', auth()->id())
-            ->where('is_archived', false)
-            ->get();
+        $query = Catatan::where('user_id', auth()->id())
+            ->where('is_archived', false);
 
-        return view('catatan.index', compact('catatan'));
+        if ($request->filled('cari')) {
+            $keyword = '%' . $request->cari . '%';
+            $query->where(function ($q) use ($keyword) {
+                $q->where('judul', 'like', $keyword)
+                  ->orWhere('isi', 'like', $keyword);
+            });
+        }
+
+        $urut = $request->get('urut', 'terbaru');
+        $query->orderBy('created_at', $urut === 'terlama' ? 'asc' : 'desc');
+
+        $catatan = $query->paginate(5)->withQueryString();
+        $jumlah_aktif = Catatan::where('user_id', auth()->id())
+            ->where('is_archived', false)
+            ->count();
+
+        return view('catatan.index', compact('catatan', 'jumlah_aktif'));
     }
 
     public function create()
@@ -131,12 +146,95 @@ class CatatanController extends Controller
         return redirect('/catatan')->with('sukses', 'Catatan dipulihkan dari arsip.');
     }
 
-    public function arsip()
+    public function arsip(Request $request)
+    {
+        $query = Catatan::where('user_id', auth()->id())
+            ->where('is_archived', true);
+
+        if ($request->filled('cari')) {
+            $keyword = '%' . $request->cari . '%';
+            $query->where(function ($q) use ($keyword) {
+                $q->where('judul', 'like', $keyword)
+                  ->orWhere('isi', 'like', $keyword);
+            });
+        }
+
+        $urut = $request->get('urut', 'terbaru');
+        $query->orderBy('created_at', $urut === 'terlama' ? 'asc' : 'desc');
+
+        $catatan = $query->paginate(5)->withQueryString();
+        $jumlah_arsip = Catatan::where('user_id', auth()->id())
+            ->where('is_archived', true)
+            ->count();
+
+        return view('catatan.arsip', compact('catatan', 'jumlah_arsip'));
+    }
+
+    public function export()
     {
         $catatan = Catatan::where('user_id', auth()->id())
-            ->where('is_archived', true)
+            ->where('is_archived', false)
+            ->orderBy('created_at', 'desc')
             ->get();
 
-        return view('catatan.arsip', compact('catatan'));
+        $filename = 'catatan_aktif_' . date('Y-m-d') . '.csv';
+
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ];
+
+        $callback = function () use ($catatan) {
+            $handle = fopen('php://output', 'w');
+            fputcsv($handle, ['Judul', 'Isi', 'Tanggal Dibuat']);
+
+            foreach ($catatan as $item) {
+                fputcsv($handle, [
+                    $item->judul,
+                    $item->isi,
+                    $item->created_at->format('d F Y H:i'),
+                ]);
+            }
+
+            fclose($handle);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
+    public function importForm()
+    {
+        return view('catatan.import');
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:csv,txt|max:2048',
+        ]);
+
+        $file = $request->file('file');
+        $handle = fopen($file->getPathname(), 'r');
+
+        // Lewati baris pertama (header)
+        fgetcsv($handle);
+
+        $jumlah = 0;
+
+        while (($row = fgetcsv($handle)) !== false) {
+            if (count($row) >= 2) {
+                Catatan::create([
+                    'user_id'     => auth()->id(),
+                    'judul'       => $row[0],
+                    'isi'         => $row[1],
+                    'is_archived' => false,
+                ]);
+                $jumlah++;
+            }
+        }
+
+        fclose($handle);
+
+        return redirect('/catatan')->with('sukses', "Berhasil mengimpor {$jumlah} catatan.");
     }
 }
