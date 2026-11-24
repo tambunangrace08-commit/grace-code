@@ -5,9 +5,12 @@
 @section('content')
 <div class="row justify-content-between mb-3">
     <div class="col">
-        <h2>Daftar Catatan</h2>
+        <h2>Catatan Aktif</h2>
     </div>
     <div class="col-auto">
+        <a href="/catatan/arsip" class="btn btn-outline-secondary me-2">
+            Arsip ({{ App\Models\Catatan::where('user_id', auth()->id())->where('is_archived', true)->count() }})
+        </a>
         <a href="{{ route('catatan.create') }}" class="btn btn-success">+ Tambah Baru</a>
     </div>
 </div>

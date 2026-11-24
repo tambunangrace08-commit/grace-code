@@ -9,9 +9,13 @@ class CatatanController extends Controller
 {
     public function index()
     {
-        $catatan = Catatan::all();
+{
+    $catatan = Catatan::where('user_id', auth()->id())
+        ->where('is_archived', false)
+        ->get();
 
-        return view('catatan.index', compact('catatan'));
+    return view('catatan.index', compact('catatan'));
+}
     }
 
     public function create()
@@ -60,4 +64,39 @@ class CatatanController extends Controller
 
         return redirect()->route('catatan.index')->with('sukses', 'Catatan berhasil dihapus!');
     }
+
+    public function archive($id)
+{
+    $catatan = Catatan::where('id', $id)
+        ->where('user_id', auth()->id())
+        ->firstOrFail();
+
+    $catatan->is_archived = true;
+    $catatan->save();
+
+    return redirect('/catatan')->with('sukses', 'Catatan telah diarsipkan.');
 }
+
+public function unarchive($id)
+{
+    $catatan = Catatan::where('id', $id)
+        ->where('user_id', auth()->id())
+        ->firstOrFail();
+
+    $catatan->is_archived = false;
+    $catatan->save();
+
+    return redirect('/catatan')->with('sukses', 'Catatan dipulihkan dari arsip.');
+}
+
+public function arsip()
+{
+    $catatan = Catatan::where('user_id', auth()->id())
+        ->where('is_archived', true)
+        ->get();
+
+    return view('catatan.arsip', compact('catatan'));
+}
+
+}
+

@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class Catatan extends Model
 {
-    protected $table = 'catatan';
-
-    protected $fillable = ['judul', 'isi'];
+    protected $fillable = ['judul', 'isi', 'lampiran', 'user_id', 'is_archived'];
 }
+

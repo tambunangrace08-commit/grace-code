@@ -25,9 +25,12 @@ Route::post('/logout', [AuthController::class, 'logout'])
 Route::middleware('auth')->prefix('catatan')->name('catatan.')->group(function () {
     Route::get('/', [CatatanController::class, 'index'])->name('index');
     Route::get('/tambah', [CatatanController::class, 'create'])->name('create');
+    Route::get('/arsip', [CatatanController::class, 'arsip'])->name('arsip');
     Route::post('/', [CatatanController::class, 'store'])->name('store');
     Route::get('/{catatan}', [CatatanController::class, 'show'])->name('show');
     Route::get('/{catatan}/edit', [CatatanController::class, 'edit'])->name('edit');
     Route::put('/{catatan}', [CatatanController::class, 'update'])->name('update');
     Route::delete('/{catatan}', [CatatanController::class, 'destroy'])->name('destroy');
+    Route::post('/{catatan}/archive', [CatatanController::class, 'archive'])->name('archive');
+    Route::post('/{catatan}/unarchive', [CatatanController::class, 'unarchive'])->name('unarchive');
 });
